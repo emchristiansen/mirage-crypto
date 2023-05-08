@@ -159,10 +159,10 @@ module X25519 : Dh
 
 (** Curve 25519 DSA, also known as Ed25519. *)
 module Ed25519 : sig
-  type priv
+  type priv := Cstruct.t
   (** The type for private keys. *)
 
-  type pub
+  type pub := Cstruct.t
   (** The type for public keys. *)
 
   (** {2 Serialisation} *)
@@ -201,4 +201,13 @@ module Ed25519 : sig
   (** [verify ~key signature msg] verifies the [signature] on the message
       [msg] with the public [key]. The return value is [true] if verification
       was successful, [false] otherwise. *)
+
+  (* ERICMC *)
+  val key_len: int
+
+  val scalar_mult_base_to_bytes: Cstruct.buffer -> Cstruct.buffer -> unit
+
+  val reduce_l: Cstruct.buffer -> unit
+
+  val muladd: Cstruct.buffer -> Cstruct.buffer -> Cstruct.buffer -> Cstruct.buffer -> unit
 end

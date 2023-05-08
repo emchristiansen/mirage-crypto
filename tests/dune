@@ -52,9 +52,9 @@
 (test
  (name test_ec)
  (modules test_ec)
- (libraries alcotest mirage-crypto mirage-crypto-ec mirage-crypto-rng.unix
+ (libraries alcotest mirage-crypto mirage-crypto-ec-arbi mirage-crypto-rng.unix
    hex)
- (package mirage-crypto-ec))
+ (package mirage-crypto-ec-arbi))
 
 (test
  (name test_ec_wycheproof)
@@ -66,9 +66,9 @@
    ecdsa_secp384r1_sha384_test.json ecdsa_secp384r1_sha512_test.json
    ecdh_secp521r1_test.json ecdsa_secp521r1_sha512_test.json
    x25519_test.json eddsa_test.json)
- (libraries alcotest mirage-crypto-ec wycheproof asn1-combinators
+ (libraries alcotest mirage-crypto-ec-arbi wycheproof asn1-combinators
    mirage-crypto-pk mirage-crypto)
- (package mirage-crypto-ec))
+ (package mirage-crypto-ec-arbi))
 
 (tests
  (names     test_eio_rng test_eio_entropy_collection)
