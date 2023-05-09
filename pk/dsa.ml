@@ -113,7 +113,7 @@ let generate ?g size =
   { p; q; gg; x; y }
 
 
-module K_gen (H : Mirage_crypto.Hash.S) = struct
+module K_gen (H : Mirage_crypto_arbi.Mirage_crypto.Hash.S) = struct
 
   let drbg : 'a Mirage_crypto_rng.generator =
     let module M = Mirage_crypto_rng.Hmac_drbg (H) in (module M)

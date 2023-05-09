@@ -1,4 +1,4 @@
-module Make (H : Mirage_crypto.Hash.S) = struct
+module Make (H : Mirage_crypto_arbi.Mirage_crypto.Hash.S) = struct
 
   open Mirage_crypto.Uncommon
 

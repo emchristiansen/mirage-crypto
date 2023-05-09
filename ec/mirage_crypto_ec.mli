@@ -38,7 +38,7 @@ module type Dh = sig
       part will be compressed. May result in an error if the buffer had an
       invalid length or was not in bounds. *)
 
-  val gen_key : ?compress:bool -> ?g:Mirage_crypto_rng.g -> unit ->
+  val gen_key : ?compress:bool -> ?g:Mirage_crypto_arbi_rng.Mirage_crypto_rng.g -> unit ->
     secret * Cstruct.t
   (** [gen_key ~compress ~g ()] generates a private and a public key for
       Ephemeral Diffie-Hellman. If [compress] is provided and [true] (defaults
@@ -100,7 +100,7 @@ module type Dsa = sig
 
   (** {2 Key generation} *)
 
-  val generate : ?g:Mirage_crypto_rng.g -> unit -> priv * pub
+  val generate : ?g:Mirage_crypto_arbi_rng.Mirage_crypto_rng.g -> unit -> priv * pub
   (** [generate ~g ()] generates a key pair. *)
 
   (** {2 Cryptographic operations} *)
@@ -123,7 +123,7 @@ module type Dsa = sig
 
   (** [K_gen] can be instantiated over a hashing module to obtain an RFC6979
       compliant [k]-generator for that hash. *)
-  module K_gen (H : Mirage_crypto.Hash.S) : sig
+  module K_gen (H : Mirage_crypto_arbi.Mirage_crypto.Hash.S) : sig
 
     val generate : key:priv -> Cstruct.t -> Cstruct.t
     (** [generate ~key digest] deterministically takes the given private key
@@ -188,7 +188,7 @@ module Ed25519 : sig
 
   (** {2 Key generation} *)
 
-  val generate : ?g:Mirage_crypto_rng.g -> unit -> priv * pub
+  val generate : ?g:Mirage_crypto_arbi_rng.Mirage_crypto_rng.g -> unit -> priv * pub
   (** [generate ~g ()] generates a key pair. *)
 
   (** {2 Cryptographic operations} *)

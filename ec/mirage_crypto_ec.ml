@@ -32,7 +32,7 @@ module type Dh = sig
   val secret_of_cs : ?compress:bool -> Cstruct.t ->
     (secret * Cstruct.t, error) result
 
-  val gen_key : ?compress:bool -> ?g:Mirage_crypto_rng.g -> unit ->
+  val gen_key : ?compress:bool -> ?g:Mirage_crypto_arbi_rng.Mirage_crypto_rng.g -> unit ->
     secret * Cstruct.t
 
   val key_exchange : secret -> Cstruct.t -> (Cstruct.t, error) result
@@ -55,13 +55,13 @@ module type Dsa = sig
 
   val pub_of_priv : priv -> pub
 
-  val generate : ?g:Mirage_crypto_rng.g -> unit -> priv * pub
+  val generate : ?g:Mirage_crypto_arbi_rng.Mirage_crypto_rng.g -> unit -> priv * pub
 
   val sign : key:priv -> ?k:Cstruct.t -> Cstruct.t -> Cstruct.t * Cstruct.t
 
   val verify : key:pub -> Cstruct.t * Cstruct.t -> Cstruct.t -> bool
 
-  module K_gen (H : Mirage_crypto.Hash.S) : sig
+  module K_gen (H : Mirage_crypto_arbi.Mirage_crypto.Hash.S) : sig
 
     val generate : key:priv -> Cstruct.t -> Cstruct.t
   end
@@ -499,7 +499,7 @@ module type Foreign_n = sig
   val to_montgomery : field_element -> field_element -> unit
 end
 
-module Make_dsa (Param : Parameters) (F : Foreign_n) (P : Point) (S : Scalar) (H : Mirage_crypto.Hash.S) = struct
+module Make_dsa (Param : Parameters) (F : Foreign_n) (P : Point) (S : Scalar) (H : Mirage_crypto_arbi.Mirage_crypto.Hash.S) = struct
   let create () = Cstruct.to_bigarray (Cstruct.create Param.fe_length)
 
   type priv = scalar
@@ -536,7 +536,7 @@ module Make_dsa (Param : Parameters) (F : Foreign_n) (P : Point) (S : Scalar) (H
     Cstruct.rev cs
 
   (* RFC 6979: compute a deterministic k *)
-  module K_gen (H : Mirage_crypto.Hash.S) = struct
+  module K_gen (H : Mirage_crypto_arbi.Mirage_crypto.Hash.S) = struct
 
     let drbg : 'a Mirage_crypto_rng.generator =
       let module M = Mirage_crypto_rng.Hmac_drbg (H) in (module M)

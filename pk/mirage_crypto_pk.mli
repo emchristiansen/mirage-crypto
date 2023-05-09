@@ -79,7 +79,7 @@ module Rsa : sig
   (** [priv_of_primes ~e ~p ~q] is the {{!type-priv}private key} derived from the
       minimal description [(e, p, q)]. *)
 
-  val priv_of_exp : ?g:Mirage_crypto_rng.g -> ?attempts:int -> e:Z.t -> d:Z.t ->
+  val priv_of_exp : ?g:Mirage_crypto_arbi_rng.Mirage_crypto_rng.g -> ?attempts:int -> e:Z.t -> d:Z.t ->
     n:Z.t -> unit -> (priv, [> `Msg of string ]) result
   (** [priv_of_exp ?g ?attempts ~e ~d n] is the unique {{!type-priv}private key}
       characterized by the public ([e]) and private ([d]) exponents, and modulus
@@ -138,7 +138,7 @@ module Rsa : sig
 
   (** {1 Key generation} *)
 
-  val generate : ?g:Mirage_crypto_rng.g -> ?e:Z.t -> bits:bits -> unit -> priv
+  val generate : ?g:Mirage_crypto_arbi_rng.Mirage_crypto_rng.g -> ?e:Z.t -> bits:bits -> unit -> priv
   (** [generate ~g ~e ~bits ()] is a new {{!type-priv}private key}. The new key is
       guaranteed to be well formed, see {!val-priv}.
 
@@ -161,7 +161,7 @@ module Rsa : sig
       key size is [priv_bits key / 8], rounded up. *)
   module PKCS1 : sig
 
-    val encrypt : ?g:Mirage_crypto_rng.g -> key:pub -> Cstruct.t -> Cstruct.t
+    val encrypt : ?g:Mirage_crypto_arbi_rng.Mirage_crypto_rng.g -> key:pub -> Cstruct.t -> Cstruct.t
     (** [encrypt g key message] is a PKCS1-padded (type 2) and encrypted
         [message].
 
@@ -191,11 +191,11 @@ module Rsa : sig
         was produced with the given [key] as per {{!sig_encode}sig_encode}, or
         [None] *)
 
-    val min_key : Mirage_crypto.Hash.hash -> bits
+    val min_key : Mirage_crypto_arbi.Mirage_crypto.Hash.hash -> bits
     (** [min_key hash] is the minimum key size required by {{!sign}[sign]}. *)
 
     val sign : ?crt_hardening:bool -> ?mask:mask ->
-      hash:Mirage_crypto.Hash.hash -> key:priv -> Cstruct.t or_digest ->
+      hash:Mirage_crypto_arbi.Mirage_crypto.Hash.hash -> key:priv -> Cstruct.t or_digest ->
       Cstruct.t
     (** [sign ~crt_hardening ~mask ~hash ~key message] is the PKCS 1.5
         signature of [message], signed by the [key], using the hash function
@@ -231,9 +231,9 @@ module Rsa : sig
 
       Keys must have a minimum of [2 + 2 * hlen + len(message)] bytes, where
       [hlen] is the hash length. *)
-  module OAEP (H : Mirage_crypto.Hash.S) : sig
+  module OAEP (H : Mirage_crypto_arbi.Mirage_crypto.Hash.S) : sig
 
-    val encrypt : ?g:Mirage_crypto_rng.g -> ?label:Cstruct.t -> key:pub ->
+    val encrypt : ?g:Mirage_crypto_arbi_rng.Mirage_crypto_rng.g -> ?label:Cstruct.t -> key:pub ->
       Cstruct.t -> Cstruct.t
     (** [encrypt ~g ~label ~key message] is {b OAEP}-padded and encrypted
         [message], using the optional [label].
@@ -257,9 +257,9 @@ module Rsa : sig
 
       Keys must have a minimum of [2 + hlen + slen] bytes, where [hlen] is the
       hash length and [slen] is the seed length. *)
-  module PSS (H: Mirage_crypto.Hash.S) : sig
+  module PSS (H: Mirage_crypto_arbi.Mirage_crypto.Hash.S) : sig
 
-    val sign : ?g:Mirage_crypto_rng.g -> ?crt_hardening:bool ->
+    val sign : ?g:Mirage_crypto_arbi_rng.Mirage_crypto_rng.g -> ?crt_hardening:bool ->
       ?mask:mask -> ?slen:int -> key:priv -> Cstruct.t or_digest -> Cstruct.t
     (** [sign ~g ~crt_hardening ~mask ~slen ~key message] the [PSS]-padded
         digest of [message], signed with the [key]. [crt_hardening] defaults
@@ -347,7 +347,7 @@ module Dsa : sig
   val pub_of_priv : priv -> pub
   (** Extract the public component from a private key. *)
 
-  val generate : ?g:Mirage_crypto_rng.g -> keysize -> priv
+  val generate : ?g:Mirage_crypto_arbi_rng.Mirage_crypto_rng.g -> keysize -> priv
   (** [generate g size] is a fresh {{!type-priv}private} key. The domain parameters
       are derived using a modified FIPS.186-4 probabilistic process, but the
       derivation can not be validated. Note that no time masking is done for the
@@ -390,7 +390,7 @@ module Dsa : sig
 
   (** [K_gen] can be instantiated over a hashing module to obtain an RFC6979
       compliant [k]-generator for that hash. *)
-  module K_gen (H : Mirage_crypto.Hash.S) : sig
+  module K_gen (H : Mirage_crypto_arbi.Mirage_crypto.Hash.S) : sig
 
     val generate : key:priv -> Cstruct.t -> Z.t
     (** [generate key digest] deterministically takes the given private key and
@@ -448,7 +448,7 @@ module Dh : sig
 
       @raise Invalid_key if [s] is degenerate. *)
 
-  val gen_key : ?g:Mirage_crypto_rng.g -> ?bits:bits -> group -> secret * Cstruct.t
+  val gen_key : ?g:Mirage_crypto_arbi_rng.Mirage_crypto_rng.g -> ?bits:bits -> group -> secret * Cstruct.t
   (** Generate a random {!secret} and the corresponding public key.
       [bits] is the exact bit-size of {!secret} and defaults to a value
       dependent on the {!type-group}'s [p].
@@ -463,7 +463,7 @@ module Dh : sig
       It is [None] if these invariants do not hold for [public]:
       [1 < public < p-1] && [public <> gg]. *)
 
-  val gen_group : ?g:Mirage_crypto_rng.g -> bits:bits -> unit -> group
+  val gen_group : ?g:Mirage_crypto_arbi_rng.Mirage_crypto_rng.g -> bits:bits -> unit -> group
   (** [gen_group ~g ~bits ()] generates a random {!type-group} with modulus size
       [bits]. Uses a safe prime [p = 2q + 1] (with [q] prime) for the modulus
       and [2] for the generator, such that [2^q = 1 mod p].
@@ -552,10 +552,10 @@ module Z_extra : sig
 
   (** {1 Random generation} *)
 
-  val gen : ?g:Mirage_crypto_rng.g -> Z.t -> Z.t
+  val gen : ?g:Mirage_crypto_arbi_rng.Mirage_crypto_rng.g -> Z.t -> Z.t
   (** [gen ~g n] picks a value in the interval [\[0, n - 1\]] uniformly at random. *)
 
-  val gen_r : ?g:Mirage_crypto_rng.g -> Z.t -> Z.t -> Z.t
+  val gen_r : ?g:Mirage_crypto_arbi_rng.Mirage_crypto_rng.g -> Z.t -> Z.t -> Z.t
   (** [gen_r ~g low high] picks a value from the interval [\[low, high - 1\]]
       uniformly at random. *)
 end
