@@ -1,5 +1,5 @@
 (executables
  (names speed)
  (modules speed)
- (libraries mirage-crypto mirage-crypto-rng mirage-crypto-rng.unix
-   mirage-crypto-pk))
+ (libraries mirage-crypto-arbi mirage-crypto-arbi-rng mirage-crypto-arbi-rng.unix
+   mirage-crypto-arbi-pk))

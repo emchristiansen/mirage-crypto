@@ -1,58 +1,58 @@
 (library
  (name test_common)
- (libraries mirage-crypto ounit2)
+ (libraries mirage-crypto-arbi ounit2)
  (modules test_common)
  (optional))
 
 (test
  (name test_symmetric_runner)
- (libraries test_common mirage-crypto ounit2)
- (package mirage-crypto)
+ (libraries test_common mirage-crypto-arbi ounit2)
+ (package mirage-crypto-arbi)
  (modules test_base test_cipher test_hash test_hmac test_symmetric_runner))
 
 (library
  (name test_common_random)
- (libraries randomconv mirage-crypto-rng)
+ (libraries randomconv mirage-crypto-arbi-rng)
  (modules test_common_random)
  (optional))
 
 (test
  (name test_random_runner)
- (libraries test_common test_common_random mirage-crypto mirage-crypto-rng
-   mirage-crypto-rng.unix ounit2)
- (package mirage-crypto-rng)
+ (libraries test_common test_common_random mirage-crypto-arbi mirage-crypto-arbi-rng
+   mirage-crypto-arbi-rng.unix ounit2)
+ (package mirage-crypto-arbi-rng)
  (modules test_random_runner))
 
 (test
  (name test_pk_runner)
- (libraries test_common test_common_random mirage-crypto-pk
-   mirage-crypto-rng.unix ounit2)
- (package mirage-crypto-pk)
+ (libraries test_common test_common_random mirage-crypto-arbi-pk
+   mirage-crypto-arbi-rng.unix ounit2)
+ (package mirage-crypto-arbi-pk)
  (modules test_numeric test_dh test_dsa test_rsa test_pk_runner))
 
 (test
  (name test_entropy_collection)
  (modules test_entropy_collection)
- (package mirage-crypto-rng-mirage)
- (libraries mirage-crypto-rng-mirage mirage-unix mirage-time-unix
+ (package mirage-crypto-arbi-rng-mirage)
+ (libraries mirage-crypto-arbi-rng-mirage mirage-unix mirage-time-unix
    mirage-clock-unix duration))
 
 (test
  (name test_entropy_collection_async)
  (modules test_entropy_collection_async)
- (package mirage-crypto-rng-async)
- (libraries mirage-crypto-rng-async))
+ (package mirage-crypto-arbi-rng-async)
+ (libraries mirage-crypto-arbi-rng-async))
 
 (test
  (name test_entropy)
  (modules test_entropy)
- (package mirage-crypto-rng)
- (libraries mirage-crypto-rng))
+ (package mirage-crypto-arbi-rng)
+ (libraries mirage-crypto-arbi-rng))
 
 (test
  (name test_ec)
  (modules test_ec)
- (libraries alcotest mirage-crypto mirage-crypto-arbi-ec mirage-crypto-rng.unix
+ (libraries alcotest mirage-crypto-arbi mirage-crypto-arbi-ec mirage-crypto-arbi-rng.unix
    hex)
  (package mirage-crypto-arbi-ec))
 
@@ -67,11 +67,11 @@
    ecdh_secp521r1_test.json ecdsa_secp521r1_sha512_test.json
    x25519_test.json eddsa_test.json)
  (libraries alcotest mirage-crypto-arbi-ec wycheproof asn1-combinators
-   mirage-crypto-pk mirage-crypto)
+   mirage-crypto-arbi-pk mirage-crypto-arbi)
  (package mirage-crypto-arbi-ec))
 
 (tests
  (names     test_eio_rng test_eio_entropy_collection)
  (modules   test_eio_rng test_eio_entropy_collection)
- (libraries mirage-crypto-rng-eio duration eio_main)
- (package   mirage-crypto-rng-eio))
+ (libraries mirage-crypto-arbi-rng-eio duration eio_main)
+ (package   mirage-crypto-arbi-rng-eio))

@@ -1,6 +1,6 @@
 (library
- (name mirage_crypto)
- (public_name mirage-crypto)
+ (name mirage_crypto_arbi)
+ (public_name mirage-crypto-arbi)
  (libraries cstruct eqaf.cstruct)
  (private_modules aead chacha20 ccm cipher_block cipher_stream hash native
    poly1305 uncommon)
