@@ -1,5 +1,5 @@
 open Mirage_crypto_arbi.Mirage_crypto
-open Mirage_crypto.Uncommon
+open Mirage_crypto_arbi.Mirage_crypto.Uncommon
 
 module AES_CTR = Cipher_block.AES.CTR
 

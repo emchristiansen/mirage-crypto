@@ -473,7 +473,7 @@ module Make_dh (Param : Parameters) (P : Point) (S : Scalar) : Dh = struct
     | Error _ as e -> e
 
   let rec generate_private_key ?g () =
-    let candidate = Mirage_crypto_rng.generate ?g Param.byte_length in
+    let candidate = Mirage_crypto_arbi_rng.Mirage_crypto_rng.generate ?g Param.byte_length in
     match S.of_cstruct candidate with
     | Ok secret -> secret
     | Error _ -> generate_private_key ?g ()
@@ -538,19 +538,19 @@ module Make_dsa (Param : Parameters) (F : Foreign_n) (P : Point) (S : Scalar) (H
   (* RFC 6979: compute a deterministic k *)
   module K_gen (H : Mirage_crypto_arbi.Mirage_crypto.Hash.S) = struct
 
-    let drbg : 'a Mirage_crypto_rng.generator =
-      let module M = Mirage_crypto_rng.Hmac_drbg (H) in (module M)
+    let drbg : 'a Mirage_crypto_arbi_rng.Mirage_crypto_rng.generator =
+      let module M = Mirage_crypto_arbi_rng.Mirage_crypto_rng.Hmac_drbg (H) in (module M)
 
     let g ~key cs =
-      let g = Mirage_crypto_rng.create ~strict:true drbg in
-      Mirage_crypto_rng.reseed ~g
+      let g = Mirage_crypto_arbi_rng.Mirage_crypto_rng.create ~strict:true drbg in
+      Mirage_crypto_arbi_rng.Mirage_crypto_rng.reseed ~g
         (Cstruct.append (S.to_cstruct key) cs);
       g
 
     (* take qbit length, and ensure it is suitable for ECDSA (> 0 & < n) *)
     let gen g =
       let rec go () =
-        let r = Mirage_crypto_rng.generate ~g Param.byte_length in
+        let r = Mirage_crypto_arbi_rng.Mirage_crypto_rng.generate ~g Param.byte_length in
         if S.is_in_range r then r else go ()
       in
       go ()
@@ -570,7 +570,7 @@ module Make_dsa (Param : Parameters) (F : Foreign_n) (P : Point) (S : Scalar) (H
     (* FIPS 186-4 B 4.2 *)
     let d =
       let rec one () =
-        match S.of_cstruct (Mirage_crypto_rng.generate ?g Param.byte_length) with
+        match S.of_cstruct (Mirage_crypto_arbi_rng.Mirage_crypto_rng.generate ?g Param.byte_length) with
         | Ok x -> x
         | Error _ -> one ()
       in
@@ -725,7 +725,7 @@ module P224 : Dh_dsa = struct
   module P = Make_point(Params)(Foreign)
   module S = Make_scalar(Params)(P)
   module Dh = Make_dh(Params)(P)(S)
-  module Dsa = Make_dsa(Params)(Foreign_n)(P)(S)(Mirage_crypto.Hash.SHA256)
+  module Dsa = Make_dsa(Params)(Foreign_n)(P)(S)(Mirage_crypto_arbi.Mirage_crypto.Hash.SHA256)
 end
 
 module P256 : Dh_dsa  = struct
@@ -776,7 +776,7 @@ module P256 : Dh_dsa  = struct
   module P = Make_point(Params)(Foreign)
   module S = Make_scalar(Params)(P)
   module Dh = Make_dh(Params)(P)(S)
-  module Dsa = Make_dsa(Params)(Foreign_n)(P)(S)(Mirage_crypto.Hash.SHA256)
+  module Dsa = Make_dsa(Params)(Foreign_n)(P)(S)(Mirage_crypto_arbi.Mirage_crypto.Hash.SHA256)
 end
 
 module P384 : Dh_dsa = struct
@@ -827,7 +827,7 @@ module P384 : Dh_dsa = struct
   module P = Make_point(Params)(Foreign)
   module S = Make_scalar(Params)(P)
   module Dh = Make_dh(Params)(P)(S)
-  module Dsa = Make_dsa(Params)(Foreign_n)(P)(S)(Mirage_crypto.Hash.SHA384)
+  module Dsa = Make_dsa(Params)(Foreign_n)(P)(S)(Mirage_crypto_arbi.Mirage_crypto.Hash.SHA384)
 end
 
 module P521 : Dh_dsa = struct
@@ -878,7 +878,7 @@ module P521 : Dh_dsa = struct
   module P = Make_point(Params)(Foreign)
   module S = Make_scalar(Params)(P)
   module Dh = Make_dh(Params)(P)(S)
-  module Dsa = Make_dsa(Params)(Foreign_n)(P)(S)(Mirage_crypto.Hash.SHA512)
+  module Dsa = Make_dsa(Params)(Foreign_n)(P)(S)(Mirage_crypto_arbi.Mirage_crypto.Hash.SHA512)
 end
 
 module X25519 = struct
@@ -903,7 +903,7 @@ module X25519 = struct
   let public priv = scalar_mult priv basepoint
 
   let gen_key ?compress:_ ?g () =
-    let secret = Mirage_crypto_rng.generate ?g key_len in
+    let secret = Mirage_crypto_arbi_rng.Mirage_crypto_rng.generate ?g key_len in
     secret, public secret
 
   let secret_of_cs ?compress:_ s =
@@ -942,7 +942,7 @@ module Ed25519 = struct
   let public secret =
     (* section 5.1.5 *)
     (* step 1 *)
-    let h = Mirage_crypto.Hash.SHA512.digest secret in
+    let h = Mirage_crypto_arbi.Mirage_crypto.Hash.SHA512.digest secret in
     (* step 2 *)
     let s, rest = Cstruct.split h key_len in
     Cstruct.set_uint8 s 0 (Cstruct.get_uint8 s 0 land 248);
@@ -973,17 +973,17 @@ module Ed25519 = struct
   let pub_to_cstruct pub = pub
 
   let generate ?g () =
-    let secret = Mirage_crypto_rng.generate ?g key_len in
+    let secret = Mirage_crypto_arbi_rng.Mirage_crypto_rng.generate ?g key_len in
     secret, pub_of_priv secret
 
   let sign ~key msg =
     (* section 5.1.6 *)
     let pub, (s, prefix) = public key in
-    let r = Mirage_crypto.Hash.SHA512.digest (Cstruct.append prefix msg) in
+    let r = Mirage_crypto_arbi.Mirage_crypto.Hash.SHA512.digest (Cstruct.append prefix msg) in
     reduce_l r.Cstruct.buffer;
     let r_big = Cstruct.create key_len in
     scalar_mult_base_to_bytes r_big.Cstruct.buffer r.Cstruct.buffer;
-    let k = Mirage_crypto.Hash.SHA512.digest (Cstruct.concat [ r_big ; pub ; msg ]) in
+    let k = Mirage_crypto_arbi.Mirage_crypto.Hash.SHA512.digest (Cstruct.concat [ r_big ; pub ; msg ]) in
     reduce_l k.Cstruct.buffer;
     let s_out = Cstruct.create key_len in
     muladd s_out.Cstruct.buffer k.Cstruct.buffer s.Cstruct.buffer r.Cstruct.buffer;
@@ -1003,7 +1003,7 @@ module Ed25519 = struct
       in
       if s_smaller_l then begin
         let k =
-          Mirage_crypto.Hash.SHA512.digest (Cstruct.concat [ r ; key ; msg ])
+          Mirage_crypto_arbi.Mirage_crypto.Hash.SHA512.digest (Cstruct.concat [ r ; key ; msg ])
         in
         reduce_l k.Cstruct.buffer;
         let r' = Cstruct.create key_len in

@@ -1,6 +1,6 @@
 module Make (H : Mirage_crypto_arbi.Mirage_crypto.Hash.S) = struct
 
-  open Mirage_crypto.Uncommon
+  open Mirage_crypto_arbi.Mirage_crypto.Uncommon
 
   type g =
     { mutable k      : Cstruct.t
