@@ -1,4 +1,4 @@
-open Mirage_crypto_rng
+open Mirage_crypto_arbi_rng.Mirage_crypto_rng
 
 let () =
   Eio_main.run @@ fun env ->

@@ -2,7 +2,7 @@ open OUnit2
 
 open Test_common
 
-open Mirage_crypto
+open Mirage_crypto_arbi.Mirage_crypto
 
 (* This is from RFC 2022 (MD5/SHA1) and 4231 (SHA2) *)
 

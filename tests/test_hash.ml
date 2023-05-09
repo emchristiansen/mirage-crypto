@@ -1,6 +1,6 @@
 open OUnit2
 
-open Mirage_crypto
+open Mirage_crypto_arbi.Mirage_crypto
 
 open Test_common
 

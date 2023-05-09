@@ -1,5 +1,5 @@
 
-open Mirage_crypto_rng
+open Mirage_crypto_arbi_rng.Mirage_crypto_rng
 
 type env = <
   clock: Eio.Time.clock;

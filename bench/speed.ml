@@ -1,4 +1,4 @@
-open Mirage_crypto
+open Mirage_crypto_arbi.Mirage_crypto
 
 open Cipher_block
 open Hash

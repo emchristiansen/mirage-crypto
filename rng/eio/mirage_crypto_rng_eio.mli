@@ -22,7 +22,7 @@ type env = <
     [g] [gen] denotes random number generator scheme to be used, eg [Mirage_crypto_rng.Fortuna].
 
     [[
-      open Mirage_crypto_rng
+      open Mirage_crypto_arbi_rng.Mirage_crypto_rng
 
       let () =
         Eio_main.run @@ fun env ->

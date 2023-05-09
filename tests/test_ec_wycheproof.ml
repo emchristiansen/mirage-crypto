@@ -1,6 +1,6 @@
 open Wycheproof
 
-open Mirage_crypto_ec
+open Mirage_crypto_arbi_ec.Mirage_crypto_ec
 
 let hex = Alcotest.testable Wycheproof.pp_hex Wycheproof.equal_hex
 

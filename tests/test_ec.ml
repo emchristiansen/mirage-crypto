@@ -1,4 +1,4 @@
-open Mirage_crypto_ec
+open Mirage_crypto_arbi_ec.Mirage_crypto_ec
 
 module Testable = struct
   let ok_or_error =

@@ -1,4 +1,4 @@
-open Mirage_crypto_rng
+open Mirage_crypto_arbi_rng.Mirage_crypto_rng
 
 let src = Logs.Src.create "mirage-crypto-rng.unix" ~doc:"Mirage crypto RNG Unix"
 module Log = (val Logs.src_log src : Logs.LOG)

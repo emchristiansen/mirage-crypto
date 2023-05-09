@@ -1,7 +1,7 @@
 open Core
 open Async
 
-open Mirage_crypto_rng
+open Mirage_crypto_arbi_rng.Mirage_crypto_rng
 
 let src = Logs.Src.create "mirage-crypto-rng-async" ~doc:"Mirage crypto RNG Async"
 module Log = (val Logs.src_log src : Logs.LOG)
