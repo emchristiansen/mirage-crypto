@@ -12,8 +12,10 @@ let dh_selftest ~bits n =
     let sh1 = Dh.shared s1 m2
     and sh2 = Dh.shared s2 m1 in
     assert_equal sh1 sh2
-      ~cmp:(eq_opt Cstruct.equal)
-      ~pp_diff:(pp_diff (pp_opt Cstruct.hexdump_pp))
+      ~cmp:(eq_opt String.equal)
+      ~pp_diff:(pp_diff (fun ppf -> function
+          | None -> Format.fprintf ppf "None"
+          | Some a -> Format.fprintf ppf "Some(%a)" (Ohex.pp_hexdump ()) a))
       ~msg:"shared secret"
 
 let dh_shared_0 =
@@ -62,10 +64,32 @@ let dh_shared_0 =
     match Dh.(shared (fst (key_of_secret grp ~s)) gy) with
     | None -> assert_failure "degenerate shared secret"
     | Some shared' ->
-        assert_cs_equal ~msg:"shared secret" shared shared'
+        assert_oct_equal ~msg:"shared secret" shared shared'
+
+let group_fine (name, Dh.{ p ; gg ; q }) =
+  name >:: fun _ ->
+    if not (Z.(p > zero && is_odd p) && Z_extra.pseudoprime p) then
+      assert_failure "invalid prime";
+    if not Z.(one < gg && gg < p) then
+      assert_failure "invalid generator";
+    let q = Option.get q in
+    if not Z.(powm gg q p = one) then
+      assert_failure "inconsistent group"
+
+let test_hardcoded_groups =
+  List.map group_fine Dh.Group.[
+      "oakley_1", oakley_1 ; "oakley_2", oakley_2 ;
+
+      "oakley_5", oakley_5 ; "oakley_14", oakley_14 ; "oakley_15", oakley_15 ;
+      "oakley_16", oakley_16 ; "oakley_17", oakley_17 ; "oakley_18", oakley_18 ;
+
+      "rfc_5114_1", rfc_5114_1 ; "rfc_5114_2", rfc_5114_2 ; "rfc_5114_3", rfc_5114_3 ;
+
+      "ffdhe2048", ffdhe2048 ; "ffdhe3072", ffdhe3072 ; "ffdhe4096", ffdhe4096 ;
+      "ffdhe6144", ffdhe6144 ; "ffdhe8192", ffdhe8192 ;
+    ]
 
 let suite = [
   dh_selftest ~bits:16  1000 ;
   dh_selftest ~bits:128 100  ;
-  dh_shared_0
-]
+  dh_shared_0 ] @ test_hardcoded_groups

@@ -13,17 +13,18 @@ build: [ ["dune" "subst"] {dev}
          ["dune" "runtest" "-p" name "-j" jobs] {with-test} ]
 
 depends: [
-  "ocaml" {>= "4.08.0"}
+  "ocaml" {>= "4.13.0"}
   "dune" {>= "2.7"}
   "dune-configurator" {>= "2.0.0"}
   "ounit2" {with-test}
-  "cstruct" {>="6.0.0"}
+  "ohex" {with-test & >= "0.2.0"}
   "eqaf" {>= "0.8"}
 ]
 conflicts: [
   "ocaml-freestanding"
+  "result" {< "1.5"}
 ]
 description: """
-Mirage-crypto provides symmetric ciphers (DES, AES, RC4, ChaCha20/Poly1305), and
-hashes (MD5, SHA-1, SHA-2).
+Mirage-crypto provides symmetric ciphers (DES, AES, RC4, ChaCha20/Poly1305).
 """
+x-maintenance-intent: [ "(latest)" ]
