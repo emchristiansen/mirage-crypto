@@ -14,15 +14,15 @@ build: [ ["dune" "subst"] {dev}
 
 depends: [
   "conf-gmp-powm-sec" {build}
-  "ocaml" {>= "4.08.0"}
+  "ocaml" {>= "4.13.0"}
   "dune" {>= "2.7"}
   "ounit2" {with-test}
-  "randomconv" {with-test & >= "0.1.3"}
-  "cstruct" {>="6.00"}
+  "randomconv" {with-test & >= "0.2.0"}
+  "ohex" {with-test & >= "0.2.0"}
   "mirage-crypto" {=version}
   "mirage-crypto-rng" {=version}
-  "sexplib0"
-  "zarith" {>= "1.4"}
+  "digestif" {>= "1.2.0"}
+  "zarith" {>= "1.13"}
   "eqaf" {>= "0.8"}
 ]
 conflicts: [
@@ -31,3 +31,4 @@ conflicts: [
 description: """
 Mirage-crypto-pk provides public-key cryptography (RSA, DSA, DH).
 """
+x-maintenance-intent: [ "(latest)" ]

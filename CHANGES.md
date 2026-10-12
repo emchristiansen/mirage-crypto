@@ -1,3 +1,302 @@
+## v2.4.1 (2026-08-26)
+
+- mirage-crypto: CCM avoid padding of already aligned associated data
+  (#299 @torinnd)
+- mirage-crypto-rng: avoid reusing registered entropy sources (#303 @torinnd)
+- mirage-crypto-pk: RSA reject encodings without a separator (#301 @torinnd)
+- mirage-crypto: poly1305 reject negative length in mac_into (#298 @torinnd)
+- mirage-crypto-rng-mkernel: seed Stdlib.Random once the RNG is seeded
+  (#300 @hannesm)
+- mirage-crypto: CCM reject oversized messages (#304 @torinnd)
+- mirage-crypto: CCM, ChaCha20, and GCM enforce block-count limits
+  (#304 #305 #306 @torinnd @hannesm)
+- mirage-crypto-rng: avoid duplicate output after fork (#302 @torinnd)
+- mirage-crypto-rng: detect RDSEED correctly (@avsm)
+- mirage-crypto-ec: return early in ed25519 double_scalar_mult on decode failure
+  (@avsm)
+- mirage-crypto-ec: X25519 compare the shared secret against zero in constant
+  time (@avsm)
+- mirage-crypto-ec: encode the compressed point at infinity as 0 (previously
+  it crashed) (@avsm)
+- mirage-crypto: ChaCha20 reject keys of not 16 or 32 byte size (@hannesm,
+  inspired by @avsm)
+
+## v2.4.0 (2026-08-17)
+
+- mirage-crypto-rng: don't display anything when running the entropy test
+  (#296 @dinosaure)
+- mirage-crypto-pk: fix hardcoded Dh groups (#297, reported by @torinnd)
+- mirage-crypto-ec: fix timing leak in lookup tables (OSEC-2026-17, reported
+  by @torinnd, acknowledged by @Firobe, fixed by @hannesm)
+
+## v2.3.0 (2026-08-07)
+
+- mirage-crypto-pk: RSA: avoid Invalid_argument when message is < 2, instead
+  raise Insufficient_key which is already documented and caught by clients
+  (OSEC-2026-14, report by @samoht,
+  fix a0f59a0c90eb067505b55a03d3bb104eacd6dd33 by @hannesm)
+- mirage-crypto-ec: NIST: add bounds check for compressed public keys (both for
+  Dsa.pub_of_octets and Dh.key_exchange) (OSEC-2026-15, reported by @samoht,
+  fix 1f0bf67044e67cf6e46911fcd77a0ff706b6c3e7 by @hannesm)
+- mirage-crypto: count_16_be_4: avoid unaligned access that causes bus error on
+  armhf (#292 @glondu)
+- mirage-crypto-rng: remove `[@@noalloc]` annotations on `getrandom` - it
+  eventually calls `uerror` (#287 @samoht)
+- mirage-crypto-rng: avoid zero-length `getentropy` call on BSD and macOS
+  (#288 @samoht)
+- mirage-crypto-pk: Dsa.sign: avoid division by 0 when k is 0 (#289 @samoht)
+- mirage-crypto: add checks that length is positive in AEAD cipher modes
+  (#290 @samoht)
+- mirage-crypto-pk: blind Dsa using (k * b) ^ -1 instead of k ^ -1 * b ^ -1
+  to avoid expensive inversion (#294 @hannesm)
+- install proper licenses for packages (#293 @hannesm)
+
+## v2.2.0 (2026-07-27)
+
+* mirage-crypto-ec: do not accept the point at infinity as ECDSA public key
+  (OSEC-2026-13, reported by @samoht (including patch), @hannesm)
+* mirage-crypto: decrypt only after AEAD tag has been validated (OSEC-2026-12,
+  reported by @samoht (including patch), fixed by @hannesm)
+* mirage-crypto-rng: expose entropy_test: unit -> unit (which raises if entropy
+  collection fails), called by Mirage_crypto_rng_mirage and
+  Mirage_crypto_rng_mkernel at initialization time (#282 @hannesm, review by
+  @dinosaure) -- moving this crucial test to startup (instead of test run)
+* mirage-crypto-ec: add blinding for ECDSA.sign (#285 @hannesm, review by
+  @edwintorok)
+* remove mirage-crypto-rng-miou-unix - use Mirage_crypto_rng_unix.use_default ()
+  (#286 @hannesm, review by @dinosaure)
+* mirage-crypto: Chacha20: reject negative offsets in
+  authenticate_{encrypt,decrypt}_into (#281 @samoht)
+* Skip entropy test on macOS x86_64 (#279 @iamanaws)
+
+## v2.1.0 (2026-03-15)
+
+* Add new module Mirage_crypto_ec.Dsa.Primitive exposing the generator, point
+  add, scalar multiplication for NIST curves. This is useful for implementing
+  some protocols (such as spake2) (#278 #277 @samoht @hannesm)
+* Cleanup gen_tables (#273 #275 @reynir)
+* Use 'architecture' 'riscv' to not execute the entropy test on riscv64 (#272
+  #273 #274 @reynir @hannesm)
+
+## v2.0.3 (2026-02-10)
+
+* Add mirage-crypto-rng-mkernel (#266 @dinosaure)
+* Add PPC macros (#269 @barracuda156)
+
+## v2.0.2 (2025-08-22)
+
+* Fix ECDSA public key compression (#268 @ansiwen)
+
+## v2.0.1 (2025-05-15)
+
+* Use arc4random_buf instead of getrandom on Android before getrandom
+  became available in API 28 (#261 @jonahbeckford)
+* Define fill_bytes for MSVC (#261 @jonahbeckford)
+* Update CI and remove DKML (#262 #265 @hannesm)
+* Update README (reported by @kit-ty-kat in #263)
+
+## v2.0.0 (2025-02-03)
+
+* Remove now superfluous mirage-crypto-rng-{eio,lwt,async} packages
+  (#256 @hannesm)
+* Remove functorisation of mirage-crypto-rng-mirage, use mirage-sleep and
+  mirage-mtime directly (#257 @hannesm)
+
+## v1.2.0 (2025-01-30)
+
+Provide thread safety (Unix.fork and multi-domain safe) RNG generators by using
+getrandom/getentropy on UNIX (or /dev/urandom). In your UNIX applications,
+please use the "mirage-crypto-rng.unix" dependency and call
+"Mirage_crypto_rng_unix.use_default ()" (instead of depending on
+mirage-crypto-rng-{lwt,eio,async} and calling
+"Mirage_crypto_rng_{eio,lwt,async}.initialize".
+
+* mirage-crypto-rng: handle CPU_RNG failures (#255 @hannesm, addresses #251 #252
+  #253)
+* mirage-crypto-rng.unix: provide two generators: Urandom and Getentropy
+  (#250 @hannesm @reynir @edwintorok, addresses #249)
+* mirage-crypto-rng: deprecate the initialize for lwt, async, eio (and
+  advertise `Mirage_crypto_rng_unix.use_default ()` (#254 @hannesm)
+* mirage-crypto-rng-eio: declare the cstruct dependency (#247 @hannesm)
+* include "windows.h" (all lowercase) (#248 @mefyl)
+
+## v1.1.0 (2024-08-20)
+
+* FEATURE mirage-crypto-ec: provide Dh.secret_to_octets (requested in #243 by
+  @palainp, implemented by @hannesm #244)
+* mirage-crypto: fix CCM implementation, discovered while porting TLS to
+  mirage-crypto 1.0.0 (@hannesm @dinosaure @reynir #242)
+
+## v1.0.0 (2024-06-29)
+
+### Breaking changes
+
+* mirage-crypto: Poly1305 API now uses string (#203 @hannesm)
+* mirage-crypto: Poly1305 no longer has type alias "type mac = string"
+  (#232 @hannesm)
+* mirage-crypto: the API uses string instead of cstruct (#214 @reynir @hannesm)
+* mirage-crypto: Hash module has been removed. Use digestif if you need hash
+  functions (#213 @hannesm)
+* mirage-crypto: the Cipher_block and Cipher_stream modules have been removed,
+  its contents is inlined:
+  Mirage_crypto.Cipher_block.S -> Mirage_crypto.Block
+  Mirage_crypto.Cipher_stream.S -> Mirage_crypto.Stream
+  Mirage_crypto.Cipher_block.AES.CTR -> Mirage_crypto.AES.CTR
+  (#225 @hannesm, suggested in #224 by @reynir)
+* mirage-crypto-pk: s-expression conversions for private and public keys (Dh,
+  Dsa, Rsa) have been removed. You can use PKCS8 for encoding and decoding
+  `X509.{Private,Public}_key.{en,de}code_{der,pem}` (#208 @hannesm)
+* mirage-crypto-pk: in the API, Cstruct.t is no longer present. Instead,
+  string is used (#211 @reynir @hannesm)
+* mirage-crypto-rng: the API uses string instead of Cstruct.t. A new function
+  `generate_into : ?g -> bytes -> ?off:int -> int -> unit` is provided
+  (#212 @hannesm @reynir)
+* mirage-crypto-ec: remove NIST P224 support (#209 @hannesm @Firobe)
+* mirage-crypto: in Uncommon.xor_into the arguments ~src_off and ~dst_off are
+  required now (#232 @hannesm), renamed to unsafe_xor_into
+  (98f01b14f5ebf98ba0e7e9c2ba97ec518f90fddc)
+* mirage-crypto-pk, mirage-crypto-rng: remove type alias "type bits = int"
+  (#236 @hannesm)
+
+### Bugfixes
+
+* mirage-crypto (32 bit systems): CCM with long adata (#207 @reynir)
+* mirage-crypto-ec: fix K_gen for bitlen mod 8 != 0 (reported in #105 that
+  P521 test vectors don't pass, re-reported #228, fixed #230 @Firobe)
+* mirage-crypto-ec: zero out bytes allocated for Field_element.zero (reported
+  mirleft/ocaml-x509#167, fixed #226 @dinosaure)
+
+### Data race free
+
+* mirage-crypto (3DES): avoid global state in key derivation (#223 @hannesm)
+* mirage-crypto-rng: use atomic instead of reference to be domain-safe (#221
+  @dinosaure @reynir @hannesm)
+* mirage-crypto, mirage-crypto-rng, mirage-crypto-pk, mirage-crypto-ec:
+  avoid global buffers, use freshly allocated strings/bytes instead, avoids
+  data races (#186 #219 @dinosaure @reynir @hannesm)
+
+### Other changes
+
+* mirage-crypto: add {de,en}crypt_into functions (and unsafe variants) to allow
+  less buffer allocations (#231 @hannesm)
+* mirage-crypto-rng-miou: new package which adds rng support with miou
+  (#227 @dinosaure)
+* PERFORMANCE mirage-crypto: ChaCha20/Poly1305 use string instead of Cstruct.t,
+  ChaCha20 interface unchanged, performance improvement roughly 2x
+  (#203 @hannesm @reynir)
+* mirage-crypto-ec, mirage-crypto-pk, mirage-crypto-rng: use digestif for
+  hashes (#212 #215 @reynir @hannesm)
+* mirage-crypto-rng: use a set for entropy sources instead of a list
+  (#218 @hannesm)
+* mirage-crypto-rng-mirage: provide a module type S (for use instead of
+  mirage-random in mirage) (#234 @hannesm)
+
+## v0.11.3 (2024-02-26)
+
+* mirage-crypto, mirage-crypto-rng{,lwt,mirage}: support CL.EXE compiler
+  (#137 @jonahbeckford) - mirage-crypto-pk not yet due to gmp dependency,
+  mirage-crypto-ec doesn't pass testsuite
+* mirage-crypto-ec: use simpler square root for ed25519 - saving 3
+  multiplications and 2 squarings, details
+  https://mailarchive.ietf.org/arch/msg/cfrg/qlKpMBqxXZYmDpXXIx6LO3Oznv4/
+  (#196 @hannesm)
+* mirage-crypto-ec: use sliding window method with pre-computed values of
+  multiples of the generator point for NIST curves, speedup around 4x for P-256
+  sign (#191 @Firobe, review @palainp @hannesm)
+* mirage-crypto-ec: documentation: warn about power timing analysis on `k` in
+  Dsa.sign (#195 @hannesm, as proposed by @edwintorok)
+* mirage-crypto-ec: replace internal Cstruct.t by string (speedup up to 2.5x)
+  (#146 @dinosaure @hannesm @reynir, review @Firobe @palainp @hannesm @reynir)
+* bench/speed: add EC (ECDSA & EdDSA generate/sign/verify, ECDH secret/share)
+  operations (#192 @hannesm)
+* mirage-crypto-rng: use rdtime instead of rdcycle on RISC-V (rdcycle is
+  privileged since Linux kernel 6.6) (#194 @AdrianBunk, review by @edwintorok)
+* mirage-crypto-rng: support Loongarch (#190 @fangyaling, review @loongson-zn)
+* mirage-crypto-rng: support NetBSD (#189 @drchrispinnock)
+* mirage-crypto-rng: allocate less in Fortuna when feeding (#188 @hannesm,
+  reported by @palainp)
+* mirage-crypto-ec: avoid mirage-crypto-pk and asn1-combinators test dependency
+  (instead, craft our own asn.1 decoder -- #200 @hannesm)
+
+### Performance differences between v0.11.2 and v0.11.3 and OpenSSL
+
+The overall result is promising: P-256 sign operation improved 9.4 times, but
+is still a 4.9 times slower than OpenSSL.
+
+Numbers in operations per second (apart from speedup, which is a factor
+v0.11.3 / v0.11.2), gathered on a Intel i7-5600U CPU 2.60GHz using FreeBSD 14.0,
+OCaml 4.14.1, and OpenSSL 3.0.12.
+
+#### P224
+
+| op     | v0.11.2 | v0.11.3 | speedup | OpenSSL |
+|--------|---------|---------|---------|---------|
+| gen    | 1160    | 20609   |    17.8 |         |
+| sign   | 931     | 8169    |     8.8 | 21319   |
+| verify | 328     | 1606    |     4.9 | 10719   |
+| dh-sec | 1011    | 12595   |    12.5 |         |
+| dh-kex | 992     | 2021    |     2.0 | 16691   |
+
+#### P256
+
+| op     | v0.11.2 | v0.11.3 | speedup | OpenSSL |
+|--------|---------|---------|---------|---------|
+| gen    | 990     | 19365   |    19.6 |         |
+| sign   | 792     | 7436    |     9.4 | 36182   |
+| verify | 303     | 1488    |     4.9 | 13383   |
+| dh-sec | 875     | 11508   |    13.2 |         |
+| dh-kex | 895     | 1861    |     2.1 | 17742   |
+
+#### P384
+
+| op     | v0.11.2 | v0.11.3 | speedup | OpenSSL |
+|--------|---------|---------|---------|---------|
+| gen    | 474     | 6703    |    14.1 |         |
+| sign   | 349     | 3061    |     8.8 | 900     |
+| verify | 147     | 544     |     3.7 | 1062    |
+| dh-sec | 378     | 4405    |    11.7 |         |
+| dh-kex | 433     | 673     |     1.6 | 973     |
+
+#### P521
+
+| op     | v0.11.2 | v0.11.3 | speedup | OpenSSL |
+|--------|---------|---------|---------|---------|
+| gen    | 185     | 1996    |    10.8 |         |
+| sign   | 137     | 438     |     3.2 | 2737    |
+| verify | 66      | 211     |     3.2 | 1354    |
+| dh-sec | 180     | 1535    |     8.5 |         |
+| dh-kex | 201     | 268     |     1.3 | 2207    |
+
+#### 25519
+
+| op     | v0.11.2 | v0.11.3 | speedup | OpenSSL |
+|--------|---------|---------|---------|---------|
+| gen    | 23271   | 22345   |     1.0 |         |
+| sign   | 11228   | 10985   |     1.0 | 21794   |
+| verify | 8149    | 8029    |     1.0 | 7729    |
+| dh-sec | 14075   | 13968   |     1.0 |         |
+| dh-kex | 13487   | 14079   |     1.0 | 24824   |
+
+
+## v0.11.2 (2023-09-18)
+
+* mirage-crypto-rng-eio: improve portability by using eio 0.7's monotonic clock
+  interface instead of mtime.clock.os. (#176 @TheLortex)
+* mirage-crypto-rng-eio: update to eio 0.12 (#182 @talex5)
+* mirage-crypto-rng: fix typo in RNG setup (#179 @samueldurantes)
+* macOS: on arm64 with clang 14.0.3, avoid instcombine (due to miscompilations)
+  reported by @samoht
+  https://github.com/mit-plv/fiat-crypto/issues/1606#issuecomment-1560122239
+  re-reported in https://github.com/ulrikstrid/ocaml-jose/issues/63 and
+  https://github.com/mirleft/ocaml-tls/issues/478
+  (#185 @hannesm @kit-ty-kate)
+* avoid "stringop-overflow" warning on PPC64 and S390x (spurious warnings) when
+  in devel mode (#178 #184 @avsm @hannesm)
+* stricter C prototypes, unsigned/signed integers (#175 @MisterDA @haesbaert
+  @avsm @hannesm)
+* support DragonFlyBSD (#181 @movepointsolutions)
+* support GNU/Hurd (#174 @pinotree)
+
 ## v0.11.1 (2023-03-09)
 
 * BUGFIX Chacha20 decrypt and encrypt with empty data (previously lead to
@@ -29,7 +328,7 @@
 - remove mirage 3 cross-compilation runes (#163 @hannesm)
 - CI: mirage-crypto-rng-eio requires ocaml 5 and dune 2.7 (#170 @hannesm, fixes
   #169 thanks to @bikallem @talex5)
-- CI: use miage 4 (#166 @hannesm)
+- CI: use mirage 4 (#166 @hannesm)
 
 ## v0.10.7 (2022-09-13)
 
